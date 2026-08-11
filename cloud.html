@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ShadowVault — Private File Repository</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0b0d11;
+      --panel: #11141a;
+      --panel-hover: #151922;
+      --border: #242832;
+
+      --text: #f1f3f7;
+      --muted: #858b98;
+
+      --accent: #7180ff;
+      --accent-hover: #6170ed;
+
+      --success: #4ed18a;
+      --success-bg: rgba(78, 209, 138, 0.10);
+    }
+
+    body {
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background: var(--bg);
+      color: var(--text);
+
+      min-height: 100vh;
+    }
+
+    /* =========================
+       MAIN CONTAINER
+    ========================= */
+
+    .container {
+      width: min(1050px, 92%);
+      margin: auto;
+      padding: 45px 0;
+    }
+
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 38px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .cloud-icon {
+      width: 48px;
+      height: 48px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 15px;
+
+      background: rgba(113, 128, 255, 0.12);
+      color: var(--accent);
+
+      border: 1px solid rgba(113, 128, 255, 0.15);
+    }
+
+    .cloud-icon svg {
+      width: 25px;
+      height: 25px;
+    }
+
+    .brand h1 {
+      font-size: 21px;
+      font-weight: 650;
+      letter-spacing: -0.3px;
+    }
+
+    .brand p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      padding: 8px 12px;
+
+      border-radius: 30px;
+
+      background: var(--success-bg);
+      color: var(--success);
+
+      border: 1px solid rgba(78, 209, 138, 0.15);
+
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+
+    /* =========================
+       OVERVIEW
+    ========================= */
+
+    .overview {
+      background: var(--panel);
+
+      border: 1px solid var(--border);
+      border-radius: 20px;
+
+      padding: 23px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 25px;
+    }
+
+    .overview-label {
+      color: var(--muted);
+      font-size: 12px;
+
+      margin-bottom: 6px;
+    }
+
+    .overview-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .stats {
+      display: flex;
+      gap: 9px;
+    }
+
+    .stat {
+      min-width: 90px;
+
+      padding: 11px 16px;
+
+      background: #0d1015;
+
+      border: 1px solid var(--border);
+      border-radius: 13px;
+    }
+
+    .stat span {
+      display: block;
+
+      color: var(--muted);
+
+      font-size: 9px;
+      letter-spacing: 0.7px;
+
+      margin-bottom: 5px;
+    }
+
+    .stat strong {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+
+    /* =========================
+       SEARCH
+    ========================= */
+
+    .controls {
+      display: flex;
+      gap: 10px;
+
+      margin-bottom: 29px;
+    }
+
+    .search {
+      flex: 1;
+    }
+
+    input,
+    select {
+      width: 100%;
+
+      padding: 13px 15px;
+
+      background: var(--panel);
+
+      border: 1px solid var(--border);
+      border-radius: 12px;
+
+      color: var(--text);
+
+      outline: none;
+
+      font-size: 13px;
+
+      transition: 0.2s;
+    }
+
+    input::placeholder {
+      color: #646a76;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: rgba(113, 128, 255, 0.6);
+      box-shadow: 0 0 0 3px rgba(113, 128, 255, 0.08);
+    }
+
+    select {
+      width: 150px;
+      cursor: pointer;
+    }
+
+
+    /* =========================
+       FILE HEADER
+    ========================= */
+
+    .files-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      margin-bottom: 12px;
+    }
+
+    .files-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .files-header p {
+      color: var(--muted);
+
+      font-size: 11px;
+
+      margin-top: 4px;
+    }
+
+    #count {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+
+    /* =========================
+       FILE LIST
+    ========================= */
+
+    .file-list {
+      display: flex;
+      flex-direction: column;
+
+      gap: 8px;
+    }
+
+    .file {
+      background: var(--panel);
+
+      border: 1px solid var(--border);
+      border-radius: 16px;
+
+      padding: 13px 15px;
+
+      display: flex;
+      align-items: center;
+
+      gap: 14px;
+
+      transition:
+        background 0.2s,
+        border 0.2s,
+        transform 0.2s;
+    }
+
+    .file:hover {
+      background: var(--panel-hover);
+
+      border-color: #303541;
+
+      transform: translateY(-1px);
+    }
+
+
+    /* =========================
+       FILE ICON
+    ========================= */
+
+    .file-icon {
+      width: 44px;
+      height: 44px;
+
+      flex-shrink: 0;
+
+      border-radius: 12px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: #171a21;
+
+      border: 1px solid #292e38;
+
+      color: #9aa1af;
+
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+
+    /* =========================
+       FILE INFORMATION
+    ========================= */
+
+    .file-info {
+      flex: 1;
+
+      min-width: 0;
+    }
+
+    .file-name {
+      font-size: 13px;
+      font-weight: 600;
+
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .file-meta {
+      color: var(--muted);
+
+      font-size: 10px;
+
+      margin-top: 5px;
+    }
+
+
+    /* =========================
+       DOWNLOAD BUTTON
+    ========================= */
+
+    .download {
+      border: none;
+
+      background: var(--accent);
+      color: white;
+
+      padding: 9px 14px;
+
+      border-radius: 10px;
+
+      cursor: pointer;
+
+      font-size: 11px;
+      font-weight: 600;
+
+      transition: 0.2s;
+    }
+
+    .download:hover {
+      background: var(--accent-hover);
+
+      transform: translateY(-1px);
+    }
+
+    .download:active {
+      transform: translateY(0);
+    }
+
+
+    /* =========================
+       EMPTY STATE
+    ========================= */
+
+    .empty {
+      display: none;
+
+      text-align: center;
+
+      background: var(--panel);
+
+      border: 1px solid var(--border);
+      border-radius: 16px;
+
+      padding: 45px;
+
+      color: var(--muted);
+
+      font-size: 13px;
+    }
+
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+
+      color: #5d636e;
+
+      font-size: 10px;
+
+      margin-top: 25px;
+    }
+
+
+    /* =========================
+       TOAST
+    ========================= */
+
+    .toast {
+      position: fixed;
+
+      left: 50%;
+      bottom: 25px;
+
+      transform: translateX(-50%);
+
+      background: #191d25;
+
+      border: 1px solid #303540;
+
+      color: #e7e9ee;
+
+      padding: 11px 17px;
+
+      border-radius: 11px;
+
+      font-size: 11px;
+
+      display: none;
+
+      box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 650px) {
+
+      .container {
+        padding: 25px 0;
+      }
+
+      .header {
+        align-items: flex-start;
+      }
+
+      .status {
+        font-size: 9px;
+      }
+
+      .overview {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 18px;
+      }
+
+      .stats {
+        width: 100%;
+      }
+
+      .stat {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      select {
+        width: 100%;
+      }
+
+      .download {
+        padding: 8px 11px;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+  <main class="container">
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+      <div class="brand">
+
+        <div class="cloud-icon">
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+          >
+
+            <path
+              d="M17.5 19H8a5 5 0 1 1 1.3-9.8
+              A6 6 0 0 1 20 11.5
+              a3.7 3.7 0 0 1-2.5 7.5Z"
+            />
+
+            <path d="M12 12v6"/>
+            <path d="m12 12-2.3 2.3"/>
+            <path d="m12 12 2.3 2.3"/>
+
+          </svg>
+
+        </div>
+
+
+        <div>
+
+          <h1>ShadowVault</h1>
+
+          <p>
+            Private file repository
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="status">
+
+        ● ONLINE
+
+      </div>
+
+    </header>
+
+
+    <!-- OVERVIEW -->
+
+    <section class="overview">
+
+      <div>
+
+        <div class="overview-label">
+          Archive overview
+        </div>
+
+        <div class="overview-title">
+          Restricted collection
+        </div>
+
+      </div>
+
+
+      <div class="stats">
+
+        <div class="stat">
+
+          <span>FILES</span>
+
+          <strong>12</strong>
+
+        </div>
+
+
+        <div class="stat">
+
+          <span>SIZE</span>
+
+          <strong>684 MB</strong>
+
+        </div>
+
+
+        <div class="stat">
+
+          <span>ACCESS</span>
+
+          <strong>READ</strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- SEARCH -->
+
+    <div class="controls">
+
+      <div class="search">
+
+        <input
+          id="search"
+          type="text"
+          placeholder="Search archived files..."
+        >
+
+      </div>
+
+
+      <select id="filter">
+
+        <option value="all">
+          All files
+        </option>
+
+        <option value="document">
+          Documents
+        </option>
+
+        <option value="archive">
+          Archives
+        </option>
+
+        <option value="image">
+          Images
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- FILES -->
+
+    <section>
+
+      <div class="files-header">
+
+        <div>
+
+          <h2>
+            Available files
+          </h2>
+
+          <p>
+            Select a file to download
+          </p>
+
+        </div>
+
+
+        <span id="count">
+          6 items
+        </span>
+
+      </div>
+
+
+      <div
+        id="fileList"
+        class="file-list"
+      ></div>
+
+
+      <div
+        id="empty"
+        class="empty"
+      >
+
+        <strong>
+          No files found
+        </strong>
+
+        <p style="margin-top:6px;">
+          Try another search term.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+      <span>
+        Last archive sync: today
+      </span>
+
+      <span>
+        Encrypted storage • Access logged
+      </span>
+
+    </footer>
+
+  </main>
+
+
+  <!-- TOAST -->
+
+  <div
+    id="toast"
+    class="toast"
+  >
+    Download prepared
+  </div>
+
+
+  <script>
+
+    const files = [
+
+      {
+        name: "operation_notes.pdf",
+        type: "document",
+        size: "8.4 MB",
+        date: "Today",
+        icon: "PDF",
+        content:
+          "Restricted operation notes\n" +
+          "Archive reference: SC-1042"
+      },
+
+      {
+        name: "target_inventory.xlsx",
+        type: "document",
+        size: "2.1 MB",
+        date: "Today",
+        icon: "XLS",
+        content:
+          "Asset inventory\n" +
+          "Internal reference data"
+      },
+
+      {
+        name: "evidence_bundle.zip",
+        type: "archive",
+        size: "412 MB",
+        date: "Yesterday",
+        icon: "ZIP",
+        content:
+          "Collected evidence bundle\n" +
+          "Archive ID: EV-7721"
+      },
+
+      {
+        name: "network_map.png",
+        type: "image",
+        size: "6.8 MB",
+        date: "Yesterday",
+        icon: "IMG",
+        content:
+          "Network topology image\n" +
+          "Restricted archive copy"
+      },
+
+      {
+        name: "credentials_backup.tar",
+        type: "archive",
+        size: "188 MB",
+        date: "Aug 09",
+        icon: "TAR",
+        content:
+          "Backup archive\n" +
+          "Repository snapshot"
+      },
+
+      {
+        name: "field_report.docx",
+        type: "document",
+        size: "3.7 MB",
+        date: "Aug 08",
+        icon: "DOC",
+        content:
+          "Field report\n" +
+          "Confidential document"
+      }
+
+    ];
+
+
+    const fileList =
+      document.getElementById("fileList");
+
+    const search =
+      document.getElementById("search");
+
+    const filter =
+      document.getElementById("filter");
+
+    const count =
+      document.getElementById("count");
+
+    const empty =
+      document.getElementById("empty");
+
+    const toast =
+      document.getElementById("toast");
+
+
+    /* =========================
+       RENDER FILES
+    ========================= */
+
+    function renderFiles() {
+
+      const query =
+        search.value
+          .toLowerCase()
+          .trim();
+
+      const selectedType =
+        filter.value;
+
+
+      const visibleFiles =
+        files.filter(file => {
+
+          const matchesSearch =
+            file.name
+              .toLowerCase()
+              .includes(query);
+
+          const matchesType =
+            selectedType === "all" ||
+            file.type === selectedType;
+
+          return (
+            matchesSearch &&
+            matchesType
+          );
+
+        });
+
+
+      fileList.innerHTML = "";
+
+
+      visibleFiles.forEach(file => {
+
+        const index =
+          files.indexOf(file);
+
+
+        const element =
+          document.createElement("div");
+
+
+        element.className =
+          "file";
+
+
+        element.innerHTML = `
+
+          <div class="file-icon">
+            ${file.icon}
+          </div>
+
+          <div class="file-info">
+
+            <div class="file-name">
+              ${file.name}
+            </div>
+
+            <div class="file-meta">
+              ${file.size} · ${file.date}
+            </div>
+
+          </div>
+
+          <button
+            class="download"
+            data-index="${index}"
+          >
+            Download
+          </button>
+
+        `;
+
+
+        fileList.appendChild(element);
+
+      });
+
+
+      count.textContent =
+        visibleFiles.length +
+        (
+          visibleFiles.length === 1
+            ? " item"
+            : " items"
+        );
+
+
+      empty.style.display =
+        visibleFiles.length === 0
+          ? "block"
+          : "none";
+
+
+      document
+        .querySelectorAll(".download")
+        .forEach(button => {
+
+          button.addEventListener(
+            "click",
+            () => {
+
+              const index =
+                Number(
+                  button.dataset.index
+                );
+
+              downloadFile(index);
+
+            }
+          );
+
+        });
+
+    }
+
+
+    /* =========================
+       DOWNLOAD
+    ========================= */
+
+    function downloadFile(index) {
+
+      const file =
+        files[index];
+
+
+      const blob =
+        new Blob(
+          [file.content],
+          {
+            type:
+              "text/plain;charset=utf-8"
+          }
+        );
+
+
+      const url =
+        URL.createObjectURL(blob);
+
+
+      const link =
+        document.createElement("a");
+
+
+      link.href = url;
+
+      link.download =
+        file.name + ".txt";
+
+
+      document
+        .body
+        .appendChild(link);
+
+
+      link.click();
+
+
+      link.remove();
+
+
+      URL.revokeObjectURL(url);
+
+
+      /* Toast */
+
+      toast.textContent =
+        "Download prepared: " +
+        file.name;
+
+
+      toast.style.display =
+        "block";
+
+
+      setTimeout(() => {
+
+        toast.style.display =
+          "none";
+
+      }, 2200);
+
+    }
+
+
+    /* =========================
+       EVENTS
+    ========================= */
+
+    search.addEventListener(
+      "input",
+      renderFiles
+    );
+
+
+    filter.addEventListener(
+      "change",
+      renderFiles
+    );
+
+
+    /* Initial render */
+
+    renderFiles();
+
+  </script>
+
+</body>
+</html>
